@@ -1,0 +1,47 @@
+# Core Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0  # JWT tokens
+passlib[bcrypt]==1.7.4            # Password hashing
+python-multipart==0.0.6           # Form data parsing
+
+# Database
+sqlalchemy==2.0.25                # ORM
+alembic==1.13.1                   # Database migrations
+psycopg2-binary==2.9.9            # PostgreSQL driver
+aiosqlite==0.19.0                 # Async SQLite (for development)
+
+# AI/ML & RAG
+langchain==0.1.0                  # LangChain framework
+langchain-openai==0.0.2           # OpenAI integration
+openai==1.7.2                     # OpenAI API
+faiss-cpu==1.7.4                  # Vector database (CPU version)
+tiktoken==0.5.2                   # Token counting
+sentence-transformers==2.2.2      # Local embeddings (optional)
+
+# Observability & Logging
+opentelemetry-api==1.22.0
+opentelemetry-sdk==1.22.0
+opentelemetry-instrumentation-fastapi==0.43b0
+python-json-logger==2.0.7         # Structured logging
+
+# Utilities
+python-dotenv==1.0.0              # Environment variables
+httpx==0.26.0                     # Async HTTP client
+tenacity==8.2.3                   # Retry logic
+
+# Development & Testing
+pytest==7.4.4
+pytest-asyncio==0.23.3
+pytest-cov==4.1.0
+black==24.1.1                     # Code formatting
+ruff==0.1.14                      # Linting
+mypy==1.8.0                       # Type checking
+
+# Documentation
+mkdocs==1.5.3                     # Documentation
+mkdocs-material==9.5.4
