@@ -2,7 +2,7 @@
 
 A production-grade backend system that treats AI agents as first-class identities with authentication, authorization, observability, and lifecycle controls.
 
-## What This Project Teaches
+## What This Project Demonstrates
 
 1. **Backend Development**: FastAPI, REST APIs, async Python
 2. **Authentication & Authorization**: OAuth2, JWT tokens, scoped permissions
