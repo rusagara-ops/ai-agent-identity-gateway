@@ -14,6 +14,7 @@ from fastapi.responses import JSONResponse
 import logging
 
 from app.config import settings
+from app.auth.routes import router as auth_router
 
 # Set up logging
 logging.basicConfig(
@@ -141,11 +142,13 @@ async def readiness_check():
 
 
 # ============================================================================
-# FUTURE ROUTE INCLUDES
+# API ROUTES
 # ============================================================================
 
-# As we build more features, we'll add routes here like:
-# app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
+# Include authentication routes
+app.include_router(auth_router)
+
+# Future routes:
 # app.include_router(agents_router, prefix="/agents", tags=["Agent Management"])
 # app.include_router(rag_router, prefix="/rag", tags=["RAG Pipeline"])
 
