@@ -14,7 +14,7 @@ from datetime import datetime
 from app.database.models import Agent, get_db
 from app.auth.schemas import AgentCreate, AgentResponse, LoginRequest, Token
 from app.auth.security import hash_password, verify_password, create_access_token
-from app.auth.dependencies import get_current_agent
+from app.auth.dependencies import get_current_agent, require_scopes
 
 # Create router with /auth prefix
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -172,3 +172,90 @@ async def revoke_agent(
     db.commit()
 
     return {"message": f"Agent '{agent.name}' has been revoked"}
+
+
+# ============================================================================
+# DEMO ENDPOINTS - Scope-Based Authorization Examples
+# ============================================================================
+
+@router.get("/demo/read-only")
+async def demo_read_endpoint(current_agent: Agent = Depends(get_current_agent)):
+    """
+    Demo endpoint: Any authenticated agent can access.
+
+    This demonstrates basic authentication without scope requirements.
+
+    Returns:
+        dict: Demo message with agent info
+    """
+    return {
+        "message": "✓ You have access to this endpoint!",
+        "endpoint": "/demo/read-only",
+        "required_scopes": "None (just authentication)",
+        "your_scopes": current_agent.scopes,
+        "agent_name": current_agent.name
+    }
+
+
+@router.get("/demo/write-protected", dependencies=[Depends(require_scopes(["write"]))])
+async def demo_write_endpoint(current_agent: Agent = Depends(get_current_agent)):
+    """
+    Demo endpoint: Requires 'write' scope.
+
+    This shows how to protect endpoints based on scopes.
+    Only agents with 'write' scope can access this.
+
+    Returns:
+        dict: Demo message showing scope enforcement
+    """
+    return {
+        "message": "✓ You have WRITE access!",
+        "endpoint": "/demo/write-protected",
+        "required_scopes": ["write"],
+        "your_scopes": current_agent.scopes,
+        "agent_name": current_agent.name,
+        "info": "This endpoint requires the 'write' scope"
+    }
+
+
+@router.get("/demo/admin-only", dependencies=[Depends(require_scopes(["admin"]))])
+async def demo_admin_endpoint(current_agent: Agent = Depends(get_current_agent)):
+    """
+    Demo endpoint: Requires 'admin' scope.
+
+    Demonstrates highest level of access control.
+    Only agents with 'admin' scope can access this.
+
+    Returns:
+        dict: Demo message showing admin-only access
+    """
+    return {
+        "message": "✓ You have ADMIN access!",
+        "endpoint": "/demo/admin-only",
+        "required_scopes": ["admin"],
+        "your_scopes": current_agent.scopes,
+        "agent_name": current_agent.name,
+        "info": "This endpoint requires the 'admin' scope",
+        "capabilities": "Can manage other agents, view all data, etc."
+    }
+
+
+@router.get("/demo/multi-scope", dependencies=[Depends(require_scopes(["read", "write"]))])
+async def demo_multi_scope_endpoint(current_agent: Agent = Depends(get_current_agent)):
+    """
+    Demo endpoint: Requires BOTH 'read' AND 'write' scopes.
+
+    Shows how to require multiple scopes simultaneously.
+    Agent must have all listed scopes to access.
+
+    Returns:
+        dict: Demo message showing multi-scope requirement
+    """
+    return {
+        "message": "✓ You have both READ and WRITE access!",
+        "endpoint": "/demo/multi-scope",
+        "required_scopes": ["read", "write"],
+        "your_scopes": current_agent.scopes,
+        "agent_name": current_agent.name,
+        "info": "This endpoint requires BOTH 'read' AND 'write' scopes"
+    }

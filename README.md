@@ -128,38 +128,96 @@ uvicorn app.main:app --reload
 
 ### Authentication
 - `POST /auth/register` - Register a new agent
-- `POST /auth/token` - Get access token
-- `POST /auth/revoke` - Revoke agent credentials
+- `POST /auth/login` - Authenticate and get JWT access token
+- `GET /auth/me` - Get current authenticated agent info (protected)
+- `POST /auth/revoke/{agent_id}` - Deactivate an agent
 
-### Agent Management
-- `GET /agents` - List all agents
-- `GET /agents/{agent_id}` - Get agent details
-- `PUT /agents/{agent_id}/permissions` - Update permissions
-- `DELETE /agents/{agent_id}` - Deactivate agent
-
-### RAG Operations
-- `POST /rag/documents` - Upload documents (requires write permission)
-- `POST /rag/query` - Query knowledge base (requires read permission)
-- `GET /rag/documents` - List documents
+### Demo Endpoints (Scope-Based Authorization)
+- `GET /auth/demo/read-only` - No scope required (just authentication)
+- `GET /auth/demo/write-protected` - Requires 'write' scope
+- `GET /auth/demo/admin-only` - Requires 'admin' scope
+- `GET /auth/demo/multi-scope` - Requires both 'read' AND 'write' scopes
 
 ### Observability
+- `GET /` - API information
 - `GET /health` - Health check
-- `GET /metrics` - Prometheus metrics
-- `GET /audit/{agent_id}` - Get agent audit logs
+- `GET /health/ready` - Readiness check
+
+### Coming Soon
+- Agent Management (list, update, delete)
+- RAG Operations (upload documents, query knowledge base)
+- Audit logs and tracing
 
 ## Development Roadmap
 
 - [x] Project structure
-- [ ] Basic FastAPI server
-- [ ] JWT authentication
-- [ ] Agent registration
-- [ ] Permission system
-- [ ] RAG pipeline
-- [ ] Access control
-- [ ] Audit logging
-- [ ] Observability
-- [ ] Docker setup
+- [x] Basic FastAPI server with health checks
+- [x] JWT authentication system
+- [x] Agent registration and credential management
+- [x] Scope-based authorization (demo endpoints)
+- [ ] RAG pipeline with vector database
+- [ ] Access control for documents
+- [ ] Audit logging and tracing
+- [ ] OpenTelemetry observability
+- [ ] Docker containerization
 - [ ] Kubernetes (optional)
+
+## Testing
+
+### Quick Start
+Run the server:
+```bash
+source venv/bin/activate
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
+```
+
+Visit the interactive API docs:
+- Swagger UI: http://localhost:8001/docs
+- ReDoc: http://localhost:8001/redoc
+
+### Test Scripts
+
+**Basic Authentication Test:**
+```bash
+./test_auth.sh
+```
+
+**Scope-Based Authorization Demo:**
+```bash
+./test_scopes.sh
+```
+
+This creates agents with different permission levels and demonstrates:
+- Reader agent (read-only access)
+- Writer agent (read + write access)
+- Admin agent (full access)
+- How scopes control endpoint access
+
+### Manual Testing Examples
+
+**Register an agent:**
+```bash
+curl -X POST http://localhost:8001/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "my-agent",
+    "password": "SecurePass123",
+    "scopes": ["read", "write"]
+  }'
+```
+
+**Login and get token:**
+```bash
+curl -X POST http://localhost:8001/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"name": "my-agent", "password": "SecurePass123"}'
+```
+
+**Access protected endpoint:**
+```bash
+TOKEN="your-jwt-token-here"
+curl -H "Authorization: Bearer $TOKEN" http://localhost:8001/auth/me
+```
 
 ## Learning Resources
 
