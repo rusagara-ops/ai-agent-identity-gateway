@@ -15,6 +15,7 @@ import logging
 
 from app.config import settings
 from app.auth.routes import router as auth_router
+from app.rag.routes import router as rag_router
 
 # Set up logging
 logging.basicConfig(
@@ -148,9 +149,11 @@ async def readiness_check():
 # Include authentication routes
 app.include_router(auth_router)
 
+# Include RAG routes
+app.include_router(rag_router)
+
 # Future routes:
 # app.include_router(agents_router, prefix="/agents", tags=["Agent Management"])
-# app.include_router(rag_router, prefix="/rag", tags=["RAG Pipeline"])
 
 
 if __name__ == "__main__":

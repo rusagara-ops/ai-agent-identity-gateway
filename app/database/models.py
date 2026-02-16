@@ -5,7 +5,7 @@ Using SQLAlchemy ORM (Object Relational Mapper) to interact with the database.
 ORM lets us use Python classes instead of raw SQL queries.
 """
 
-from sqlalchemy import Column, String, DateTime, Boolean, JSON, create_engine
+from sqlalchemy import Column, String, DateTime, Boolean, JSON, Integer, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
@@ -68,6 +68,38 @@ class Agent(Base):
     def __repr__(self):
         """String representation for debugging."""
         return f"<Agent(id={self.id}, name={self.name}, active={self.is_active})>"
+
+
+class Document(Base):
+    """
+    Document model - represents uploaded documents with access control.
+
+    Documents are owned by agents and stored with embeddings for semantic search.
+    """
+    __tablename__ = "documents"
+
+    # Primary key
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+
+    # Document metadata
+    filename = Column(String, nullable=False)
+    content = Column(String, nullable=False)  # Original text content
+    file_type = Column(String, nullable=False)  # pdf, txt, etc.
+
+    # Ownership and access control
+    owner_id = Column(String, nullable=False)  # Agent who uploaded this
+    allowed_scopes = Column(JSON, default=list)  # Which scopes can access this
+
+    # Vector database reference
+    vector_ids = Column(JSON, default=list)  # FAISS vector IDs for chunks
+
+    # Metadata
+    created_at = Column(DateTime, default=datetime.utcnow)
+    size_bytes = Column(Integer, nullable=True)
+
+    def __repr__(self):
+        """String representation for debugging."""
+        return f"<Document(id={self.id}, filename={self.filename}, owner={self.owner_id})>"
 
 
 # Create all tables in the database
